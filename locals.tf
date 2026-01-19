@@ -70,29 +70,18 @@ locals {
   min_length = 1
 
   # build base name
-  base_name_generated = var.base_name != "" ? var.base_name : (
-    local.use_hyphens_in_name ? 
-      "${var.prefix}-${var.environment}-${local.location_short}-${local.resource_type_code}" :
-      "${var.prefix}${var.environment}${local.location_short}${local.resource_type_code}"
-  )
+  base_name_generated = var.base_name != "" ? var.base_name : (local.use_hyphens_in_name ? "${var.prefix}-${var.environment}-${local.location_short}-${local.resource_type_code}" : "${var.prefix}${var.environment}${local.location_short}${local.resource_type_code}")
 
   # format instance as 001, 002 etc
   instance_formatted = format("%03d", var.instance_number)
 
   # final name
-  generated_name = local.use_hyphens_in_name ? 
-    "${local.base_name_generated}-${local.instance_formatted}" :
-    "${local.base_name_generated}${local.instance_formatted}"
+  generated_name = local.use_hyphens_in_name ? "${local.base_name_generated}-${local.instance_formatted}" : "${local.base_name_generated}${local.instance_formatted}"
 
   # check length
   name_length_valid = length(local.generated_name) >= local.min_length && length(local.generated_name) <= local.max_length
 
   # check format based on resource type
-  name_format_valid = var.resource_type_name == "storage_account" ? 
-    can(regex("^[a-z0-9]+$", local.generated_name)) : (
-      var.resource_type_name == "private_endpoint" ?
-        can(regex("^[a-z0-9][a-z0-9\\-_.]*[a-z0-9]$|^[a-z0-9]$", local.generated_name)) :
-        can(regex("^[a-z0-9][a-z0-9\\-.]*[a-z0-9]$|^[a-z0-9]$", local.generated_name))
-    )
+  name_format_valid = var.resource_type_name == "storage_account" ? can(regex("^[a-z0-9]+$", local.generated_name)) : (var.resource_type_name == "private_endpoint" ? can(regex("^[a-z0-9][a-z0-9\\-_.]*[a-z0-9]$|^[a-z0-9]$", local.generated_name)) : can(regex("^[a-z0-9][a-z0-9\\-.]*[a-z0-9]$|^[a-z0-9]$", local.generated_name)))
 }
 
